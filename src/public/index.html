@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distribuidora - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo-container">
+                <div class="logo-placeholder" id="logo-upload">
+                    <i class="fas fa-upload"></i>
+                    <span>Adicionar Logo</span>
+                    <input type="file" id="logo-input" accept="image/*" style="display: none;">
+                </div>
+                <h2>Distribuidora</h2>
+            </div>
+            <nav>
+                <ul>
+                    <li class="active" data-page="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</li>
+                    <li data-page="pedidos"><i class="fas fa-shopping-cart"></i> Pedidos</li>
+                    <li data-page="conversas"><i class="fas fa-comments"></i> Conversas</li>
+                    <li data-page="produtos"><i class="fas fa-box"></i> Produtos</li>
+                    <li data-page="relatorios"><i class="fas fa-chart-bar"></i> Relatórios</li>
+                    <li data-page="configuracoes"><i class="fas fa-cog"></i> Configurações</li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main>
+            <header>
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar pedidos, clientes...">
+                </div>
+                <div class="user-info">
+                    <span class="notification"><i class="fas fa-bell"></i></span>
+                    <span class="user"><i class="fas fa-user"></i> Admin</span>
+                </div>
+            </header>
+
+            <!-- Dashboard Page -->
+            <div class="page active" id="dashboard-page">
+                <h1>Dashboard</h1>
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+                        <div class="stat-info">
+                            <h3>Pedidos Hoje</h3>
+                            <p class="stat-value" id="pedidos-hoje">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
+                        <div class="stat-info">
+                            <h3>Faturamento</h3>
+                            <p class="stat-value" id="faturamento-hoje">R$ 0,00</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-truck"></i></div>
+                        <div class="stat-info">
+                            <h3>Em Entrega</h3>
+                            <p class="stat-value" id="em-entrega">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <h3>Clientes Ativos</h3>
+                            <p class="stat-value" id="clientes-ativos">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-orders">
+                    <div class="section-header">
+                        <h2>Pedidos Recentes</h2>
+                        <button class="view-all" data-page="pedidos">Ver Todos</button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Cliente</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-orders-table">
+                                <!-- Será preenchido via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pedidos Page -->
+            <div class="page" id="pedidos-page">
+                <h1>Gerenciamento de Pedidos</h1>
+                <div class="filter-container">
+                    <div class="filter-group">
+                        <label>Status:</label>
+                        <select id="status-filter">
+                            <option value="all">Todos</option>
+                            <option value="pending">Pendentes</option>
+                            <option value="confirmed">Confirmados</option>
+                            <option value="preparing">Em Preparação</option>
+                            <option value="out_for_delivery">Em Entrega</option>
+                            <option value="delivered">Entregues</option>
+                            <option value="cancelled">Cancelados</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Data:</label>
+                        <input type="date" id="date-filter">
+                    </div>
+                    <button id="apply-filters">Aplicar Filtros</button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Telefone</th>
+                                <th>Valor</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table">
+                            <!-- Será preenchido via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination">
+                    <button id="prev-page"><i class="fas fa-chevron-left"></i></button>
+                    <span id="page-info">Página 1 de 1</span>
+                    <button id="next-page"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Conversas Page -->
+            <div class="page" id="conversas-page">
+                <h1>Conversas com Clientes</h1>
+                <div class="chat-container">
+                    <div class="chat-list">
+                        <div class="chat-search">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Buscar cliente...">
+                        </div>
+                        <div class="chat-contacts" id="chat-contacts">
+                            <!-- Será preenchido via JavaScript -->
+                        </div>
+                    </div>
+                    <div class="chat-messages">
+                        <div class="chat-header">
+                            <div class="chat-contact-info">
+                                <i class="fas fa-user-circle"></i>
+                                <div>
+                                    <h3 id="chat-contact-name">Selecione um cliente</h3>
+                                    <p id="chat-contact-status"></p>
+                                </div>
+                            </div>
+                            <div class="chat-actions">
+                                <button id="view-orders"><i class="fas fa-shopping-cart"></i> Ver Pedidos</button>
+                            </div>
+                        </div>
+                        <div class="chat-body" id="chat-body">
+                            <!-- Será preenchido via JavaScript -->
+                            <div class="chat-start-message">Selecione um cliente para ver a conversa</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Produtos Page -->
+            <div class="page" id="produtos-page">
+                <h1>Produtos</h1>
+                <div class="products-container">
+                    <div class="products-header">
+                        <div class="search-container">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="product-search" placeholder="Buscar produtos...">
+                        </div>
+                        <button class="btn-primary" id="add-product" onclick="createNewProduct()"><i class="fas fa-plus"></i> Adicionar Produto</button>
+                    </div>
+                    <div class="products-grid" id="products-grid">
+                        <!-- Será preenchido via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Relatórios Page -->
+            <div class="page" id="relatorios-page">
+                <h1>Relatórios</h1>
+                <div class="reports-container">
+                    <div class="report-filters">
+                        <div class="form-group">
+                            <label>Período:</label>
+                            <select id="report-period">
+                                <option value="daily">Hoje</option>
+                                <option value="weekly">Esta Semana</option>
+                                <option value="monthly">Este Mês</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary" id="generate-report" onclick="generateReport()">Gerar Relatório</button>
+                    </div>
+                    <div class="report-content" id="report-content">
+                        <!-- Será preenchido via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configurações Page -->
+            <div class="page" id="configuracoes-page">
+                <h1>Configurações</h1>
+                <div class="settings-container">
+                    <div class="settings-section">
+                        <h3>WhatsApp Bot</h3>
+                        <div class="form-group">
+                            <label>Status da Conexão:</label>
+                            <span id="bot-status" class="status-indicator">Desconectado</span>
+                            <button class="btn-primary" id="connect-bot" onclick="toggleBotConnection()">Conectar Bot</button>
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h3>Configurações Gerais</h3>
+                        <div class="form-group">
+                            <label>Nome da Empresa:</label>
+                            <input type="text" id="company-name" value="Distribuidora">
+                        </div>
+                        <div class="form-group">
+                            <label>Telefone:</label>
+                            <input type="text" id="company-phone" placeholder="(11) 99999-9999">
+                        </div>
+                        <div class="form-group">
+                            <label>Endereço:</label>
+                            <textarea id="company-address" placeholder="Endereço da empresa"></textarea>
+                        </div>
+                        <button class="btn-primary" id="save-settings">Salvar Configurações</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para detalhes do pedido -->
+    <div class="modal" id="order-details-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalhes do Pedido</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body" id="order-details-body">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary close-modal">Fechar</button>
+                <button class="btn-primary" id="print-order">Imprimir</button>
+                <button class="btn-success" id="update-status">Atualizar Status</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para atualizar status -->
+    <div class="modal" id="update-status-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Atualizar Status do Pedido</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="update-status-form">
+                    <div class="form-group">
+                        <label>Novo Status:</label>
+                        <select id="new-status">
+                            <option value="confirmed">Confirmado</option>
+                            <option value="preparing">Em Preparação</option>
+                            <option value="out_for_delivery">Saiu para Entrega</option>
+                            <option value="delivered">Entregue</option>
+                            <option value="cancelled">Cancelado</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="cancel-reason-group" style="display: none;">
+                        <label>Motivo do Cancelamento:</label>
+                        <textarea id="cancel-reason"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary close-modal">Cancelar</button>
+                <button class="btn-primary" id="confirm-status-update">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
