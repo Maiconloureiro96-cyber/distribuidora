@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Pedidos - Distribuidora do Negão</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            min-height: 100vh;
+            color: #ffcc00;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .logo-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .company-logo {
+            max-width: 200px;
+            max-height: 100px;
+            margin: 10px auto;
+            display: block;
+        }
+
+        .filters-container {
+            background: #1a1a1a;
+            border: 2px solid #ffcc00;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(255,204,0,0.2);
+            overflow: hidden;
+        }
+
+        .filters-header {
+            background: #ffcc00;
+            color: #1a1a1a;
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.3em;
+            transition: background 0.3s ease;
+        }
+
+        .filters-header:hover {
+            background: #e6b800;
+        }
+
+        .filters-content {
+            padding: 0 20px;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            max-height: 0;
+            overflow: hidden;
+        }
+
+        .filters-content.expanded {
+            max-height: 500px;
+            padding: 20px;
+        }
+
+        .filters-toggle {
+            transition: transform 0.3s ease;
+        }
+
+        .filters-toggle.rotated {
+            transform: rotate(180deg);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            font-weight: bold;
+            color: #ffcc00;
+            margin-bottom: 5px;
+        }
+
+        .filter-input {
+            padding: 10px;
+            border: 2px solid #ffcc00;
+            border-radius: 6px;
+            font-size: 1em;
+            background: #2d2d2d;
+            color: #ffcc00;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #e6b800;
+            background: #1a1a1a;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: #ffcc00;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: #e6b800;
+        }
+
+        .filter-results {
+            background: #2d2d2d;
+            border: 1px solid #ffcc00;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            color: #ffcc00;
+        }
+
+        .filter-results.show {
+            display: block;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #ffcc00;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .filter-results h4, .filter-results h5 {
+            color: #ffcc00;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffcc00;
+        }
+
+        .stat-label {
+            color: #333;
+            margin-top: 5px;
+        }
+
+        .orders-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .orders-section {
+            background: #1a1a1a;
+            border: 2px solid #ffcc00;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(255,204,0,0.2);
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #ffcc00;
+            border-bottom: 2px solid #ffcc00;
+            padding-bottom: 10px;
+        }
+
+        .order-card {
+            background: #2d2d2d;
+            border-left: 4px solid #ffcc00;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            color: #ffcc00;
+        }
+
+        .order-card.processing {
+            border-left-color: #ff9900;
+        }
+
+        .order-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .order-number {
+            font-weight: bold;
+            color: #ffcc00;
+            font-size: 1.1em;
+        }
+
+        .order-time {
+            color: #cccccc;
+            font-size: 0.9em;
+        }
+
+        .customer-info {
+            margin-bottom: 10px;
+        }
+
+        .customer-name {
+            font-weight: bold;
+            color: #ffcc00;
+        }
+
+        .customer-phone {
+            color: #cccccc;
+            font-size: 0.9em;
+        }
+
+        .order-items {
+            margin-bottom: 15px;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .item-name {
+            color: #ffcc00;
+        }
+
+        .item-price {
+            font-weight: bold;
+            color: #ffcc00;
+        }
+
+        .order-total {
+            text-align: right;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ffcc00;
+            margin-bottom: 15px;
+            padding-top: 10px;
+            border-top: 2px solid #ffcc00;
+        }
+
+        .order-address {
+            background: #1a1a1a;
+            border: 1px solid #ffcc00;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: #ffcc00;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .btn-print {
+            background: #ffcc00;
+            color: #1a1a1a;
+            font-weight: bold;
+        }
+
+        .btn-print:hover {
+            background: #e6b800;
+        }
+
+        .btn-process {
+            background: #ff9900;
+            color: #1a1a1a;
+            font-weight: bold;
+        }
+
+        .btn-process:hover {
+            background: #e68a00;
+        }
+
+        .btn-complete {
+            background: #ffcc00;
+            color: #1a1a1a;
+            font-weight: bold;
+        }
+
+        .btn-complete:hover {
+            background: #e6b800;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: #28a745;
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        .audio-alert {
+            display: none;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+        }
+
+        .new-order {
+            animation: pulse 2s infinite;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            .print-content, .print-content * {
+                visibility: visible;
+            }
+            
+            .print-content {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+
+        .print-content {
+            display: none;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .print-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px dashed #000;
+            padding-bottom: 10px;
+        }
+
+        .print-items {
+            margin-bottom: 15px;
+        }
+
+        .print-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .print-total {
+            border-top: 1px dashed #000;
+            padding-top: 10px;
+            text-align: right;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-container">
+                <!-- INSIRA SUA LOGO AQUI: Substitua o src abaixo pelo caminho da sua logo -->
+                <!-- Exemplo: <img src="caminho/para/sua/logo.png" class="company-logo" alt="Logo da Empresa"> -->
+                <img src="" class="company-logo" alt="Logo da Empresa" style="display: none;">
+            </div>
+            <h1>🍺 Distribuidora do Negão</h1>
+            <p>Sistema de Gerenciamento de Pedidos</p>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters-container">
+            <div class="filters-header" onclick="toggleFilters()">
+                <span>📊 Filtros e Relatórios</span>
+                <span class="filters-toggle" id="filtersToggle">▶</span>
+            </div>
+            <div class="filters-content" id="filtersContent">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">Data Inicial:</label>
+                        <input type="date" id="startDate" class="filter-input">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Data Final:</label>
+                        <input type="date" id="endDate" class="filter-input">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Status do Pedido:</label>
+                        <select id="statusFilter" class="filter-input">
+                            <option value="all">Todos</option>
+                            <option value="new">Novos</option>
+                            <option value="processing">Em Preparo</option>
+                            <option value="completed">Concluídos</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <button onclick="applyFilters()" class="filter-btn">🔍 Filtrar</button>
+                    </div>
+                    <div class="filter-group">
+                        <button onclick="generateDailyReport()" class="filter-btn">📈 Relatório do Dia</button>
+                    </div>
+                </div>
+                
+                <div id="filterResults" class="filter-results">
+                    <!-- Resultados dos filtros aparecerão aqui -->
+                </div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="newOrdersCount">0</div>
+                <div class="stat-label">Novos Pedidos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="processingOrdersCount">0</div>
+                <div class="stat-label">Em Preparo</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalRevenue">R$ 0,00</div>
+                <div class="stat-label">Faturamento Hoje</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedOrdersCount">0</div>
+                <div class="stat-label">Entregues</div>
+            </div>
+        </div>
+
+        <div class="orders-container">
+            <div class="orders-section">
+                <h2 class="section-title">🆕 Novos Pedidos</h2>
+                <div id="newOrders"></div>
+            </div>
+
+            <div class="orders-section">
+                <h2 class="section-title">🚚 Em Preparo/Entrega</h2>
+                <div id="processingOrders"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Audio Alert -->
+    <audio id="audioAlert" class="audio-alert" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmEcBSuU2+6jciUFIUHL8NmIQAkVY" type="audio/wav">
+    </audio>
+
+    <!-- Print Content Template -->
+    <div class="print-content" id="printContent">
+        <!-- Content will be dynamically generated -->
+    </div>
+
+    <script>
+        // Dados simulados para demonstração
+        let orders = [];
+        let stats = {
+            new: 0,
+            processing: 0,
+            completed: 0,
+            revenue: 0
+        };
+
+        // Simular dados iniciais
+        function initializeDemoData() {
+            const demoOrders = [
+                {
+                    id: '001',
+                    customer: 'João Silva',
+                    phone: '(11) 99999-1234',
+                    items: [
+                        { name: 'Cerveja Skol 350ml', quantity: 12, price: 2.50 },
+                        { name: 'Refrigerante Coca-Cola 2L', quantity: 2, price: 8.90 },
+                        { name: 'Saco de Gelo 5kg', quantity: 1, price: 7.00 }
+                    ],
+                    address: 'Rua das Flores, 123 - Centro',
+                    payment: 'Dinheiro',
+                    status: 'new',
+                    timestamp: new Date(),
+                    total: 54.90
+                }
+            ];
+
+            orders = [...demoOrders];
+            updateStats();
+            renderOrders();
+        }
+
+        // Função para conectar com N8N via Polling
+        function connectToN8N() {
+            // CONFIGURAÇÃO: URL base do N8N
+            // Para desenvolvimento local: 'http://localhost:5678'
+            // Para produção: substitua pela URL do seu N8N
+            const N8N_BASE_URL = window.location.origin; // ou configure manualmente: 'http://localhost:5678'
+            
+            // Polling para buscar novos pedidos a cada 10 segundos
+            setInterval(async () => {
+                try {
+                    const response = await fetch(`${N8N_BASE_URL}/webhook/api/orders`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const ordersData = await response.json();
+                        
+                        // Processar novos pedidos
+                        if (Array.isArray(ordersData)) {
+                            ordersData.forEach(orderData => {
+                                // Verificar se é um pedido novo que ainda não temos
+                                const existingOrder = orders.find(o => o.id === orderData.order_id);
+                                if (!existingOrder && orderData.status === 'new') {
+                                    const formattedOrder = formatOrderFromN8N(orderData);
+                                    receiveNewOrder(formattedOrder);
+                                }
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar pedidos do N8N:', error);
+                }
+            }, 10000);
+            
+            // Simulação para demo (remova em produção)
+            setInterval(() => {
+                if (Math.random() > 0.8) {
+                    receiveNewOrder(generateRandomOrder());
+                }
+            }, 45000);
+        }
+        
+        // Função para formatar pedidos vindos do N8N/Supabase
+        function formatOrderFromN8N(orderData) {
+            let parsedOrderData = {};
+            
+            try {
+                parsedOrderData = typeof orderData.order_data === 'string' 
+                    ? JSON.parse(orderData.order_data) 
+                    : orderData.order_data || {};
+            } catch (e) {
+                console.warn('Erro ao parsear order_data:', e);
+            }
+            
+            return {
+                id: orderData.order_id || Date.now().toString(),
+                customer: orderData.customer_name || 'Cliente N8N',
+                phone: orderData.customer_phone || '(11) 0000-0000',
+                items: parsedOrderData.items || [
+                    { name: 'Produto via N8N', quantity: 1, price: 10.00 }
+                ],
+                address: orderData.delivery_address || 'Endereço via N8N',
+                payment: orderData.payment_method || 'N/A',
+                status: orderData.status || 'new',
+                timestamp: new Date(orderData.created_at || Date.now()),
+                total: parseFloat(orderData.total_amount) || 0
+            };
+        }
+
+        function generateRandomOrder() {
+            const names = ['Maria Santos', 'Pedro Oliveira', 'Ana Costa', 'Carlos Silva'];
+            const items = [
+                { name: 'Cerveja Brahma 350ml', price: 2.30 },
+                { name: 'Cerveja Skol 350ml', price: 2.50 },
+                { name: 'Refrigerante Pepsi 2L', price: 7.90 },
+                { name: 'Água Mineral 1.5L', price: 3.50 },
+                { name: 'Saco de Gelo 5kg', price: 7.00 }
+            ];
+
+            const orderItems = [];
+            const numItems = Math.floor(Math.random() * 3) + 1;
+            
+            for (let i = 0; i < numItems; i++) {
+                const item = items[Math.floor(Math.random() * items.length)];
+                const quantity = Math.floor(Math.random() * 10) + 1;
+                orderItems.push({
+                    ...item,
+                    quantity
+                });
+            }
+
+            const total = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            return {
+                id: Date.now().toString(),
+                customer: names[Math.floor(Math.random() * names.length)],
+                phone: `(11) 9999-${Math.floor(Math.random() * 9000) + 1000}`,
+                items: orderItems,
+                address: 'Rua Exemplo, 456 - Vila Nova',
+                payment: Math.random() > 0.5 ? 'Dinheiro' : 'PIX',
+                status: 'new',
+                timestamp: new Date(),
+                total: total
+            };
+        }
+
+        function receiveNewOrder(orderData) {
+            orders.push(orderData);
+            
+            // Play sound alert
+            const audio = document.getElementById('audioAlert');
+            audio.play().catch(e => console.log('Audio play failed:', e));
+            
+            // Show notification
+            showNotification('🆕 Novo pedido recebido!', 'success');
+            
+            updateStats();
+            renderOrders();
+            
+            // Highlight new order
+            setTimeout(() => {
+                const newOrderElement = document.querySelector(`[data-order-id="${orderData.id}"]`);
+                if (newOrderElement) {
+                    newOrderElement.classList.add('new-order');
+                    setTimeout(() => {
+                        newOrderElement.classList.remove('new-order');
+                    }, 5000);
+                }
+            }, 100);
+        }
+
+        function updateStats() {
+            stats.new = orders.filter(o => o.status === 'new').length;
+            stats.processing = orders.filter(o => o.status === 'processing').length;
+            stats.completed = orders.filter(o => o.status === 'completed').length;
+            stats.revenue = orders.filter(o => o.status === 'completed')
+                .reduce((sum, order) => sum + order.total, 0);
+
+            document.getElementById('newOrdersCount').textContent = stats.new;
+            document.getElementById('processingOrdersCount').textContent = stats.processing;
+            document.getElementById('completedOrdersCount').textContent = stats.completed;
+            document.getElementById('totalRevenue').textContent = `R$ ${stats.revenue.toFixed(2).replace('.', ',')}`;
+        }
+
+        function renderOrders() {
+            const newOrdersContainer = document.getElementById('newOrders');
+            const processingOrdersContainer = document.getElementById('processingOrders');
+            
+            newOrdersContainer.innerHTML = '';
+            processingOrdersContainer.innerHTML = '';
+            
+            orders.forEach(order => {
+                const orderElement = createOrderElement(order);
+                
+                if (order.status === 'new') {
+                    newOrdersContainer.appendChild(orderElement);
+                } else if (order.status === 'processing') {
+                    processingOrdersContainer.appendChild(orderElement);
+                }
+            });
+        }
+
+        function createOrderElement(order) {
+            const orderDiv = document.createElement('div');
+            orderDiv.className = `order-card ${order.status === 'processing' ? 'processing' : ''}`;
+            orderDiv.setAttribute('data-order-id', order.id);
+            
+            const itemsHtml = order.items.map(item => `
+                <div class="item">
+                    <span class="item-name">${item.quantity}x ${item.name}</span>
+                    <span class="item-price">R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}</span>
+                </div>
+            `).join('');
+            
+            orderDiv.innerHTML = `
+                <div class="order-header">
+                    <div class="order-number">Pedido #${order.id}</div>
+                    <div class="order-time">${order.timestamp.toLocaleTimeString()}</div>
+                </div>
+                
+                <div class="customer-info">
+                    <div class="customer-name">${order.customer}</div>
+                    <div class="customer-phone">${order.phone}</div>
+                </div>
+                
+                <div class="order-items">
+                    ${itemsHtml}
+                </div>
+                
+                <div class="order-total">
+                    Total: R$ ${order.total.toFixed(2).replace('.', ',')}
+                </div>
+                
+                <div class="order-address">
+                    📍 ${order.address}
+                    <br>💳 ${order.payment}
+                </div>
+                
+                <div class="order-actions">
+                    <button class="btn btn-print" onclick="printOrder('${order.id}')">
+                        🖨️ Imprimir
+                    </button>
+                    ${order.status === 'new' ? 
+                        `<button class="btn btn-process" onclick="updateOrderStatus('${order.id}', 'processing')">
+                            ⏳ Processar
+                        </button>` :
+                        `<button class="btn btn-complete" onclick="updateOrderStatus('${order.id}', 'completed')">
+                            ✅ Concluir
+                        </button>`
+                    }
+                </div>
+            `;
+            
+            return orderDiv;
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.status = newStatus;
+                
+                // Aqui você faria a chamada para o Supabase via N8N
+                updateOrderInSupabase(orderId, newStatus);
+                
+                updateStats();
+                renderOrders();
+                
+                const statusText = newStatus === 'processing' ? 'Em preparo' : 'Concluído';
+                showNotification(`Pedido #${orderId} ${statusText}`, 'success');
+            }
+        }
+
+        async function updateOrderInSupabase(orderId, status) {
+            // Chamada para o webhook N8N que atualiza o Supabase
+            const N8N_BASE_URL = window.location.origin; // ou configure manualmente: 'http://localhost:5678'
+            
+            try {
+                const response = await fetch(`${N8N_BASE_URL}/webhook/update-order-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        orderId: orderId,
+                        status: status,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('Status atualizado com sucesso:', result);
+                
+            } catch (error) {
+                console.error('Erro ao atualizar no Supabase via N8N:', error);
+                showNotification('Erro ao atualizar status no servidor', 'error');
+            }
+        }
+
+        function printOrder(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            const printContent = document.getElementById('printContent');
+            
+            const itemsHtml = order.items.map(item => `
+                <div class="print-item">
+                    <span>${item.quantity}x ${item.name}</span>
+                    <span>R$ ${(item.price * item.quantity).toFixed(2)}</span>
+                </div>
+            `).join('');
+            
+            printContent.innerHTML = `
+                <div class="print-header">
+                    <div><strong>DISTRIBUIDORA DO NEGÃO</strong></div>
+                    <div>Pedido #${order.id}</div>
+                    <div>${new Date().toLocaleString()}</div>
+                </div>
+                
+                <div>
+                    <div><strong>Cliente:</strong> ${order.customer}</div>
+                    <div><strong>Telefone:</strong> ${order.phone}</div>
+                    <div><strong>Endereço:</strong> ${order.address}</div>
+                    <div><strong>Pagamento:</strong> ${order.payment}</div>
+                </div>
+                
+                <br>
+                
+                <div class="print-items">
+                    ${itemsHtml}
+                </div>
+                
+                <div class="print-total">
+                    <strong>TOTAL: R$ ${order.total.toFixed(2)}</strong>
+                </div>
+                
+                <br>
+                <div style="text-align: center; font-size: 10px;">
+                    Obrigado pela preferência!
+                </div>
+            `;
+            
+            printContent.style.display = 'block';
+            window.print();
+            printContent.style.display = 'none';
+            
+            showNotification('Pedido enviado para impressão', 'success');
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Logo será inserida diretamente no HTML - veja comentários no código
+
+        // Filter functions
+        function initializeFilters() {
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            
+            document.getElementById('startDate').value = todayStr;
+            document.getElementById('endDate').value = todayStr;
+        }
+
+        function applyFilters() {
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            if (!document.getElementById('startDate').value || !document.getElementById('endDate').value) {
+                showNotification('Por favor, selecione as datas para filtrar', 'error');
+                return;
+            }
+            
+            // Adjust end date to include the entire day
+            endDate.setHours(23, 59, 59, 999);
+            
+            let filteredOrders = orders.filter(order => {
+                const orderDate = new Date(order.timestamp);
+                const dateMatch = orderDate >= startDate && orderDate <= endDate;
+                const statusMatch = statusFilter === 'all' || order.status === statusFilter;
+                
+                return dateMatch && statusMatch;
+            });
+            
+            displayFilterResults(filteredOrders, startDate, endDate, statusFilter);
+        }
+
+        function generateDailyReport() {
+            const today = new Date();
+            const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+            
+            const todayOrders = orders.filter(order => {
+                const orderDate = new Date(order.timestamp);
+                return orderDate >= startOfDay && orderDate <= endOfDay;
+            });
+            
+            displayDailyReport(todayOrders);
+        }
+
+        function displayFilterResults(filteredOrders, startDate, endDate, statusFilter) {
+            const resultsContainer = document.getElementById('filterResults');
+            
+            if (filteredOrders.length === 0) {
+                resultsContainer.innerHTML = '<p>Nenhum pedido encontrado para os filtros selecionados.</p>';
+                resultsContainer.classList.add('show');
+                return;
+            }
+            
+            const totalRevenue = filteredOrders
+                .filter(order => order.status === 'completed')
+                .reduce((sum, order) => sum + order.total, 0);
+            
+            const statusCounts = {
+                new: filteredOrders.filter(o => o.status === 'new').length,
+                processing: filteredOrders.filter(o => o.status === 'processing').length,
+                completed: filteredOrders.filter(o => o.status === 'completed').length
+            };
+            
+            const statusText = statusFilter === 'all' ? 'Todos os status' : 
+                statusFilter === 'new' ? 'Novos' :
+                statusFilter === 'processing' ? 'Em Preparo' : 'Concluídos';
+            
+            resultsContainer.innerHTML = `
+                <h4>📊 Resultados do Filtro</h4>
+                <p><strong>Período:</strong> ${startDate.toLocaleDateString()} até ${endDate.toLocaleDateString()}</p>
+                <p><strong>Status:</strong> ${statusText}</p>
+                <br>
+                <div class="result-item">
+                    <span><strong>Total de Pedidos:</strong></span>
+                    <span><strong>${filteredOrders.length}</strong></span>
+                </div>
+                <div class="result-item">
+                    <span>Novos:</span>
+                    <span>${statusCounts.new}</span>
+                </div>
+                <div class="result-item">
+                    <span>Em Preparo:</span>
+                    <span>${statusCounts.processing}</span>
+                </div>
+                <div class="result-item">
+                    <span>Concluídos:</span>
+                    <span>${statusCounts.completed}</span>
+                </div>
+                <div class="result-item">
+                    <span><strong>Faturamento Total:</strong></span>
+                    <span><strong>R$ ${totalRevenue.toFixed(2).replace('.', ',')}</strong></span>
+                </div>
+            `;
+            
+            resultsContainer.classList.add('show');
+        }
+
+        function displayDailyReport(todayOrders) {
+            const resultsContainer = document.getElementById('filterResults');
+            
+            const totalRevenue = todayOrders
+                .filter(order => order.status === 'completed')
+                .reduce((sum, order) => sum + order.total, 0);
+            
+            const statusCounts = {
+                new: todayOrders.filter(o => o.status === 'new').length,
+                processing: todayOrders.filter(o => o.status === 'processing').length,
+                completed: todayOrders.filter(o => o.status === 'completed').length
+            };
+            
+            // Calculate most sold items
+            const itemCounts = {};
+            todayOrders.forEach(order => {
+                order.items.forEach(item => {
+                    if (itemCounts[item.name]) {
+                        itemCounts[item.name] += item.quantity;
+                    } else {
+                        itemCounts[item.name] = item.quantity;
+                    }
+                });
+            });
+            
+            const topItems = Object.entries(itemCounts)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 3)
+                .map(([name, quantity]) => `<div class="result-item"><span>${name}</span><span>${quantity} unidades</span></div>`)
+                .join('');
+            
+            resultsContainer.innerHTML = `
+                <h4>📈 Relatório do Dia - ${new Date().toLocaleDateString()}</h4>
+                <br>
+                <div class="result-item">
+                    <span><strong>Total de Pedidos Hoje:</strong></span>
+                    <span><strong>${todayOrders.length}</strong></span>
+                </div>
+                <div class="result-item">
+                    <span>Novos:</span>
+                    <span>${statusCounts.new}</span>
+                </div>
+                <div class="result-item">
+                    <span>Em Preparo:</span>
+                    <span>${statusCounts.processing}</span>
+                </div>
+                <div class="result-item">
+                    <span>Concluídos:</span>
+                    <span>${statusCounts.completed}</span>
+                </div>
+                <div class="result-item">
+                    <span><strong>Faturamento do Dia:</strong></span>
+                    <span><strong>R$ ${totalRevenue.toFixed(2).replace('.', ',')}</strong></span>
+                </div>
+                <br>
+                <h5>🏆 Produtos Mais Vendidos Hoje:</h5>
+                ${topItems || '<p>Nenhum produto vendido hoje.</p>'}
+            `;
+            
+            resultsContainer.classList.add('show');
+        }
+
+        // Toggle filters visibility
+        function toggleFilters() {
+            const filtersContent = document.getElementById('filtersContent');
+            const filtersToggle = document.getElementById('filtersToggle');
+            
+            filtersContent.classList.toggle('expanded');
+            filtersToggle.classList.toggle('rotated');
+            
+            if (filtersContent.classList.contains('expanded')) {
+                filtersToggle.textContent = '▼';
+            } else {
+                filtersToggle.textContent = '▶';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDemoData();
+            connectToN8N();
+            initializeFilters();
+            
+            // Update timestamp every minute
+            setInterval(() => {
+                renderOrders();
+            }, 60000);
+        });
+    </script>
+</body>
+</html>
