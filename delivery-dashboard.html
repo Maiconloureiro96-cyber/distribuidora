@@ -589,15 +589,17 @@
 
         // Função para conectar com N8N via Polling
         function connectToN8N() {
-            // CONFIGURAÇÃO: URL base do N8N
-            // Para desenvolvimento local: 'http://localhost:5678'
-            // Para produção: substitua pela URL do seu N8N
-            const N8N_BASE_URL = window.location.origin; // ou configure manualmente: 'http://localhost:5678'
+            // ✅ CONFIGURAÇÃO DE PRODUÇÃO - N8N
+            const N8N_BASE_URL = 'https://n8n-n8n.uq9iy3.easypanel.host';
+            
+            // ✅ CONFIGURAÇÃO DE PRODUÇÃO - SUPABASE
+            const SUPABASE_URL = 'https://kukapittzevmhkbhnlby.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1a2FwaXR0emV2bWhrYmhubGJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0OTY2MDAsImV4cCI6MjA2NzA3MjYwMH0.DOTAVdQDJk1zKwqIorIbHkPEO38N1rpzHE-KAwlHf3Y';
             
             // Polling para buscar novos pedidos a cada 10 segundos
             setInterval(async () => {
                 try {
-                    const response = await fetch(`${N8N_BASE_URL}/webhook/api/orders`, {
+                    const response = await fetch(`${N8N_BASE_URL}/webhook/dashboard/orders`, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json'
@@ -812,7 +814,7 @@
                 order.status = newStatus;
                 
                 // Aqui você faria a chamada para o Supabase via N8N
-                updateOrderInSupabase(orderId, newStatus);
+            updateOrderInSupabase(orderId, newStatus);
                 
                 updateStats();
                 renderOrders();
@@ -824,10 +826,10 @@
 
         async function updateOrderInSupabase(orderId, status) {
             // Chamada para o webhook N8N que atualiza o Supabase
-            const N8N_BASE_URL = window.location.origin; // ou configure manualmente: 'http://localhost:5678'
+            const N8N_BASE_URL = 'https://n8n-n8n.uq9iy3.easypanel.host';
             
             try {
-                const response = await fetch(`${N8N_BASE_URL}/webhook/update-order-status`, {
+                const response = await fetch(`${N8N_BASE_URL}/webhook/orders/update-status`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
